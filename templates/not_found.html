@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}not found{% endblock %}
+
+{% block main %}
+<section class="hero">
+  <h1>not found</h1>
+  <p class="lede">no repository named <code>{{ name }}</code>.</p>
+  <p><a href="/">back to repo list</a></p>
+</section>
+{% endblock %}

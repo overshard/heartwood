@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# post-receive hook generated for heartwood by taproot's quickstart.sh.
+# Lives on the alpine server at /srv/git/heartwood.git/hooks/post-receive.
+#
+# Identical to every other project's hook: pull, rebuild, reattach to the
+# shared bythewood-edge network so Caddy can find us.
+
+while read oldrev newrev ref; do
+  if [ "$ref" = "refs/heads/master" ]; then
+    unset GIT_DIR
+    START_TIME=$(date +%s)
+    cd /srv/docker/heartwood
+    git pull
+    docker compose up --build --detach
+    # Reattach every container in the project to the shared edge network.
+    # Resolved via `compose ps` (not `heartwood`) so this works regardless
+    # of the compose service name or container_name override.
+    for cid in $(docker compose ps -q); do
+      docker network connect bythewood-edge "$cid" 2>/dev/null || true
+    done
+    docker container prune --force
+    docker image prune --force
+    END_TIME=$(date +%s)
+    echo "Total build time: $((END_TIME - START_TIME))s"
+  fi
+done

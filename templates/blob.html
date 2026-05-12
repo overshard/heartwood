@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · {{ path }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <div class="container">
+    <a href="/">repos</a>
+    <span class="breadcrumbs__sep">/</span>
+    <a href="/{{ repo.name }}">{{ repo.name }}</a>
+    <span class="breadcrumbs__sep">/</span>
+    <a href="/{{ repo.name }}/tree/{{ rev }}">tree</a>
+    {% set parts = path|split('/') %}
+    {% set cumulative = '' %}
+    {% for part in parts %}
+      <span class="breadcrumbs__sep">/</span>
+      {% if not loop.last %}
+        {% set cumulative = cumulative ~ '/' ~ part %}
+        <a href="/{{ repo.name }}/tree/{{ rev }}{{ cumulative }}">{{ part }}</a>
+      {% else %}
+        <strong>{{ part }}</strong>
+      {% endif %}
+    {% endfor %}
+    <span class="breadcrumbs__ref">@ {{ rev }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<div class="blob-head">
+  <span class="blob-head__size">{{ size|filesize }}</span>
+  <a class="blob-head__raw" href="/{{ repo.name }}/raw/{{ rev }}/{{ path }}">raw</a>
+</div>
+
+{% if is_binary %}
+<p class="empty">binary file. <a href="/{{ repo.name }}/raw/{{ rev }}/{{ path }}">download raw</a></p>
+{% else %}
+<div class="blob">{{ highlighted }}</div>
+{% endif %}
+{% endblock %}

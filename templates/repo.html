@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <div class="container">
+    <a href="/">repos</a> / <strong>{{ repo.name }}</strong>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<section class="repo-head">
+  <div class="repo-head__title-row">
+    <h1>{{ repo.name }}</h1>
+    <span class="repo-head__branch">{{ repo.default_branch }}</span>
+  </div>
+  {% if repo.description %}<p class="repo-head__desc">{{ repo.description }}</p>{% endif %}
+  <div class="clone-box">
+    <label>clone</label>
+    <input type="text" readonly value="git clone {{ repo.clone_url }}">
+  </div>
+  <nav class="repo-nav">
+    <a href="/{{ repo.name }}">overview</a>
+    <a href="/{{ repo.name }}/tree/{{ repo.default_branch }}">tree</a>
+    <a href="/{{ repo.name }}/log">log</a>
+    <a href="/{{ repo.name }}/atom.xml">atom</a>
+  </nav>
+</section>
+
+<div class="two-col">
+  <section class="col-main">
+    {% if readme_html %}
+    <article class="readme">{{ readme_html }}</article>
+    {% else %}
+    <p class="empty">No README in this repo.</p>
+    {% endif %}
+  </section>
+
+  <aside class="col-side">
+    <h2 class="side-h">recent commits</h2>
+    {% if commits %}
+    <ul class="commit-list">
+      {% for c in commits %}
+      <li>
+        <a class="sha" href="/{{ repo.name }}/commit/{{ c.id }}">{{ c.short_id }}</a>
+        <span class="summary">{{ c.summary }}</span>
+        <span class="meta">{{ c.author }} · {{ c.time|naturaltime }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <p><a href="/{{ repo.name }}/log">all commits →</a></p>
+    {% else %}
+    <p class="empty">No commits yet.</p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

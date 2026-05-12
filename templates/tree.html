@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · {{ path or '/' }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <div class="container">
+    <a href="/">repos</a>
+    <span class="breadcrumbs__sep">/</span>
+    <a href="/{{ repo.name }}">{{ repo.name }}</a>
+    <span class="breadcrumbs__sep">/</span>
+    <a href="/{{ repo.name }}/tree/{{ rev }}">tree</a>
+    {% set cumulative = '' %}
+    {% for part in breadcrumb %}
+      {% set cumulative = cumulative ~ '/' ~ part %}
+      <span class="breadcrumbs__sep">/</span>
+      <a href="/{{ repo.name }}/tree/{{ rev }}{{ cumulative }}">{{ part }}</a>
+    {% endfor %}
+    <span class="breadcrumbs__ref">@ {{ rev }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<table class="tree">
+  <tbody>
+    {% if breadcrumb %}
+    {% set parent_path = breadcrumb[:-1]|join('/') %}
+    <tr>
+      <td class="tree__name"><a href="/{{ repo.name }}/tree/{{ rev }}{% if parent_path %}/{{ parent_path }}{% endif %}">..</a></td>
+      <td class="tree__size"></td>
+    </tr>
+    {% endif %}
+    {% for e in entries %}
+    <tr>
+      <td class="tree__name tree__name--{{ e.kind }}">
+        {% set basepath = breadcrumb|join('/') %}
+        {% if e.kind == 'tree' %}
+        <a href="/{{ repo.name }}/tree/{{ rev }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name }}">{{ e.name }}/</a>
+        {% elif e.kind == 'blob' %}
+        <a href="/{{ repo.name }}/blob/{{ rev }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name }}">{{ e.name }}</a>
+        {% else %}
+        <span>{{ e.name }}</span>
+        {% endif %}
+      </td>
+      <td class="tree__size">{% if e.size is not none %}{{ e.size|filesize }}{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

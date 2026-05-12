@@ -1,0 +1,37 @@
+[package]
+name = "heartwood"
+version = "0.1.0"
+edition = "2021"
+# With a second binary in src/bin/ (seed), `cargo run` becomes ambiguous.
+# Pin the default to the server so `cargo run` from the Makefile still works.
+default-run = "heartwood"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["fs", "set-header"] }
+minijinja = { version = "2", features = ["loader", "loop_controls"] }
+gix = { version = "0.66", default-features = false, features = ["max-performance-safe", "blob-diff", "revision"] }
+syntect = { version = "5", default-features = false, features = ["default-fancy"] }
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+ammonia = "4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dotenvy = "0.15"
+bytes = "1"
+urlencoding = "2"
+futures-util = "0.3"
+async-stream = "0.3"
+mime_guess = "2"
+
+[profile.release]
+# Match darkfurrow: small + fast. Heartwood has no chunky dep tree
+# (no typst, no chromium) so LTO is tractable.
+lto = true
+codegen-units = 1
+strip = true

@@ -1,0 +1,9 @@
+target
+dist
+frontend/node_modules
+fixtures
+.env
+.git
+.gitignore
+*.md
+samplefiles

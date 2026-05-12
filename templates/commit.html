@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · {{ commit.short_id }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <div class="container">
+    <a href="/">repos</a> / <a href="/{{ repo.name }}">{{ repo.name }}</a> / <a href="/{{ repo.name }}/log">log</a> / <strong>{{ commit.short_id }}</strong>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<section class="commit-head">
+  <h1>{{ commit.summary }}</h1>
+  <p class="meta">
+    <span class="sha">{{ commit.short_id }}</span>
+    by <strong>{{ commit.author }}</strong>
+    · {{ commit.time|naturaltime }}
+  </p>
+  {% if commit.message and commit.message|length > commit.summary|length + 1 %}
+  <pre class="commit-msg">{{ commit.message }}</pre>
+  {% endif %}
+</section>
+
+<section class="diff">
+  {% for f in files %}
+  <article class="file-diff">
+    <header class="file-diff__head">
+      <span class="status status--{{ f.status }}">{{ f.status }}</span>
+      <span class="path">{% if f.old_path %}{{ f.old_path }} → {% endif %}{{ f.path }}</span>
+    </header>
+    {% if f.is_binary %}
+    <p class="empty">binary file</p>
+    {% else %}
+    {% for h in f.hunks %}
+    {# No literal newlines inside the <pre>: .line is display:block so each
+       span already starts a new line. A trailing \n in the source would
+       double the vertical space per line. #}
+    <pre class="hunk"><span class="hunk-hdr">{{ h.header }}</span>{% for l in h.lines %}<span class="line line--{{ l.kind }}">{{ l.text }}</span>{% endfor %}</pre>
+    {% endfor %}
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

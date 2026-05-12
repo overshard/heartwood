@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ repo.name }}</title>
+  <subtitle>{{ repo.description }}</subtitle>
+  <link rel="self" href="{{ clone_base }}/{{ repo.name }}/atom.xml"/>
+  <link rel="alternate" type="text/html" href="{{ clone_base }}/{{ repo.name }}"/>
+  <id>{{ clone_base }}/{{ repo.name }}</id>
+  <updated>{{ now.rfc3339 }}</updated>
+  {% for c in commits %}
+  <entry>
+    <id>{{ clone_base }}/{{ repo.name }}/commit/{{ c.id }}</id>
+    <title>{{ c.summary }}</title>
+    <link rel="alternate" type="text/html" href="{{ clone_base }}/{{ repo.name }}/commit/{{ c.id }}"/>
+    <author>
+      <name>{{ c.author }}</name>
+      <email>{{ c.author_email }}</email>
+    </author>
+    <updated>{{ c.time|rfc3339 }}</updated>
+    <content type="text">{{ c.message }}</content>
+  </entry>
+  {% endfor %}
+</feed>

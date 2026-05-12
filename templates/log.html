@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · log{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <div class="container">
+    <a href="/">repos</a> / <a href="/{{ repo.name }}">{{ repo.name }}</a> / <strong>log</strong>
+    <span class="breadcrumbs__ref">@ {{ rev }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block main %}
+<h1>log</h1>
+<ul class="log-list">
+  {% for c in commits %}
+  <li class="log-row">
+    <a class="sha" href="/{{ repo.name }}/commit/{{ c.id }}">{{ c.short_id }}</a>
+    <div class="log-row__body">
+      <p class="summary">{{ c.summary }}</p>
+      <p class="meta">{{ c.author }} · {{ c.time|naturaltime }}</p>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

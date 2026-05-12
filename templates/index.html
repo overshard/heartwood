@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}repositories{% endblock %}
+
+{% block main %}
+<section class="hero">
+  <h1>repositories</h1>
+  <p class="lede">code from <a href="https://isaacbythewood.com">isaac bythewood</a>, served straight from the bare repos.</p>
+</section>
+
+{% if repos %}
+<ul class="repo-list">
+  {% for repo in repos %}
+  <li class="repo-row">
+    <div class="repo-row__head">
+      <a class="repo-row__name" href="/{{ repo.name }}">{{ repo.name }}</a>
+      {% if repo.head_time %}
+      <span class="repo-row__age" title="{{ repo.head_id|shortsha }}">{{ repo.head_time|naturaltime }}</span>
+      {% endif %}
+    </div>
+    {% if repo.description %}
+    <p class="repo-row__desc">{{ repo.description }}</p>
+    {% endif %}
+    {% if repo.head_summary %}
+    <p class="repo-row__last"><span class="repo-row__last-sha">{{ repo.head_id|shortsha }}</span> {{ repo.head_summary }}</p>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">No repositories yet.</p>
+{% endif %}
+{% endblock %}

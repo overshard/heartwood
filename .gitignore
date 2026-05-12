@@ -1,0 +1,7 @@
+/target
+/dist
+/frontend/node_modules
+/fixtures/git
+.env
+.DS_Store
+*.swp
