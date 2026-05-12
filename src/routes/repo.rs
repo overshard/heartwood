@@ -31,7 +31,11 @@ async fn repo_page(Path(name): Path<String>, State(state): State<AppState>) -> R
         let readme_html = head.as_ref().and_then(|h| {
             crate::git::read_readme(&repo, h.id).map(|(_, bytes)| {
                 let text = String::from_utf8_lossy(&bytes).into_owned();
-                crate::markdown::render(&text)
+                let link_base =
+                    format!("/{}/blob/{}", name_for_blocking, summary.default_branch);
+                let image_base =
+                    format!("/{}/raw/{}", name_for_blocking, summary.default_branch);
+                crate::markdown::render(&text, &link_base, &image_base)
             })
         });
         Ok((summary, commits, readme_html))
