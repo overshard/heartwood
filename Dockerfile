@@ -1,11 +1,10 @@
 # syntax=docker/dockerfile:1
 # ----- builder -----
-FROM rust:1-slim-bookworm AS builder
+FROM rust:alpine AS builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache musl-dev
 
-COPY --from=oven/bun:debian /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:alpine /usr/local/bin/bun /usr/local/bin/bun
 
 WORKDIR /app
 
@@ -20,20 +19,19 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     cp target/release/heartwood /app/heartwood
 
 # ----- runtime -----
-# debian-slim, not alpine: alpine's `git` apk omits `git-http-backend`,
-# which the smart-HTTP clone endpoint depends on. The other Rust services
-# in this workspace stay on alpine; heartwood is the only one that needs
-# the CGI binary.
-FROM debian:bookworm-slim
+FROM alpine:3.23
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# git-daemon is the apk that ships /usr/libexec/git-core/git-http-backend
+# (the plain `git` apk omits it; the package name is misleading, we don't
+# actually run the daemon). http-backend powers the smart-HTTP clone
+# endpoint; `git` itself is needed for the `git show` subprocess in
+# diff_commit. ca-certificates so any outbound TLS just works.
+RUN apk add --no-cache git git-daemon ca-certificates
 
-# The bare repos under /srv/git are owned by root on the host; the web
-# process runs as UID 1000. Without this, git's CVE-2022-24765 ownership
-# check refuses every operation with "dubious ownership". The read-only
-# bind mount in docker-compose.yml is the real safety control here.
+# Bare repos under /srv/git are root-owned on the host; the web process
+# runs as UID 1000. Without this, git's CVE-2022-24765 ownership check
+# refuses every operation with "dubious ownership". The read-only bind
+# mount in docker-compose.yml is the real safety control here.
 RUN git config --system --add safe.directory '*'
 
 WORKDIR /app
@@ -42,8 +40,8 @@ COPY --from=builder /app/heartwood ./heartwood
 COPY --from=builder /app/dist ./dist
 COPY templates ./templates
 
-RUN groupadd -g 1000 app && \
-    useradd -u 1000 -g app -d /app -s /usr/sbin/nologin -M app && \
+RUN addgroup -S -g 1000 app && \
+    adduser -S -h /app -s /sbin/nologin -u 1000 -G app app && \
     chown -R app:app /app
 USER app
 
