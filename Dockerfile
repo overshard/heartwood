@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 # ----- builder -----
-FROM rust:alpine AS builder
+FROM rust:1-slim-bookworm AS builder
 
-RUN apk add --no-cache musl-dev
+RUN apt-get update && apt-get install -y --no-install-recommends pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY --from=oven/bun:alpine /usr/local/bin/bun /usr/local/bin/bun
+COPY --from=oven/bun:debian /usr/local/bin/bun /usr/local/bin/bun
 
 WORKDIR /app
 
@@ -19,12 +20,15 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     cp target/release/heartwood /app/heartwood
 
 # ----- runtime -----
-FROM alpine:3.23
+# debian-slim, not alpine: alpine's `git` apk omits `git-http-backend`,
+# which the smart-HTTP clone endpoint depends on. The other Rust services
+# in this workspace stay on alpine; heartwood is the only one that needs
+# the CGI binary.
+FROM debian:bookworm-slim
 
-# git is required at runtime: clone endpoints shell out to `git http-backend`
-# (the canonical CGI), and the commit-diff view shells out to `git show`.
-# ca-certificates so any outbound TLS just works.
-RUN apk add --no-cache git ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -32,8 +36,8 @@ COPY --from=builder /app/heartwood ./heartwood
 COPY --from=builder /app/dist ./dist
 COPY templates ./templates
 
-RUN addgroup -S -g 1000 app && \
-    adduser -S -h /app -s /sbin/nologin -u 1000 -G app app && \
+RUN groupadd -g 1000 app && \
+    useradd -u 1000 -g app -d /app -s /usr/sbin/nologin -M app && \
     chown -R app:app /app
 USER app
 
