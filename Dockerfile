@@ -30,6 +30,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# The bare repos under /srv/git are owned by root on the host; the web
+# process runs as UID 1000. Without this, git's CVE-2022-24765 ownership
+# check refuses every operation with "dubious ownership". The read-only
+# bind mount in docker-compose.yml is the real safety control here.
+RUN git config --system --add safe.directory '*'
+
 WORKDIR /app
 
 COPY --from=builder /app/heartwood ./heartwood
