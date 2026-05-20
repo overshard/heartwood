@@ -1,11 +1,11 @@
 services:
   web:
-    container_name: heartwood
+    container_name: repos
     build: .
     init: true
     env_file: .env
     environment:
-      HEARTWOOD_REPO_ROOT: /srv/git
+      REPOS_REPO_ROOT: /srv/git
     volumes:
       # /srv/git lives on the host (the bare repos the deploy hooks push to).
       # Mount read-only so the web process can't corrupt a bare repo, even

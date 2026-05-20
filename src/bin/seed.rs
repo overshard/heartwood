@@ -1,5 +1,5 @@
 //! Generate fake-but-realistic bare git repos under `fixtures/git/` so the
-//! heartwood landing page has something to render in dev. Each repo gets a
+//! repos landing page has something to render in dev. Each repo gets a
 //! month of commit history with multiple authors, a per-archetype file shape
 //! (Rust crate, TS lib, Python package, markdown blog, dotfiles), and commit
 //! messages drawn from a per-archetype corpus.
@@ -1280,7 +1280,7 @@ fn seed_one(
     // fixtures dir. Doing the bare clone at the end lets us use the regular
     // working-tree commit flow (which is much simpler than driving
     // commit-tree directly).
-    let work = std::env::temp_dir().join(format!("heartwood-seed-{name}"));
+    let work = std::env::temp_dir().join(format!("repos-seed-{name}"));
     if work.exists() {
         fs::remove_dir_all(&work).map_err(|e| e.to_string())?;
     }
@@ -1349,7 +1349,7 @@ fn seed_one(
         return Err(format!("clone exited {:?}", status.code()));
     }
 
-    // Per-repo description (heartwood reads `description` for the landing
+    // Per-repo description (repos reads `description` for the landing
     // page). git's stock placeholder is filtered out in src/git.rs.
     fs::write(target.join("description"), format!("{}\n", arch.description))
         .map_err(|e| e.to_string())?;

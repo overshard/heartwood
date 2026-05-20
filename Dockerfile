@@ -16,7 +16,7 @@ RUN cd frontend && bun install --frozen-lockfile && bun run build
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/app/target \
     cargo build --release && \
-    cp target/release/heartwood /app/heartwood
+    cp target/release/repos /app/repos
 
 # ----- runtime -----
 FROM alpine:3.23
@@ -36,7 +36,7 @@ RUN git config --system --add safe.directory '*'
 
 WORKDIR /app
 
-COPY --from=builder /app/heartwood ./heartwood
+COPY --from=builder /app/repos ./repos
 COPY --from=builder /app/dist ./dist
 COPY templates ./templates
 
@@ -46,7 +46,7 @@ RUN addgroup -S -g 1000 app && \
 USER app
 
 ENV PORT=8000
-ENV HEARTWOOD_REPO_ROOT=/srv/git
+ENV REPOS_REPO_ROOT=/srv/git
 EXPOSE 8000
 
-CMD ["./heartwood"]
+CMD ["./repos"]

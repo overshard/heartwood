@@ -2,7 +2,7 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 
 // Vite output goes to ../dist; Rust serves it at /static/.
-// Single entry point — heartwood has no per-page scripts to split.
+// Single entry point, no per-page scripts to split.
 export default defineConfig({
   base: "/static/",
   publicDir: resolve(__dirname, "static_src/public"),

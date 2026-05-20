@@ -4,7 +4,7 @@ PORT  ?= 8000
 # In dev the bare repos at /srv/git live on the production server, not here.
 # Use ./fixtures/git as the local repo root; `make seed` populates it so
 # `make run` has something to show on the landing page.
-HEARTWOOD_REPO_ROOT ?= $(CURDIR)/fixtures/git
+REPOS_REPO_ROOT ?= $(CURDIR)/fixtures/git
 
 .DEFAULT_GOAL := run
 .PHONY: run build start clean push seed seed-reset
@@ -15,7 +15,7 @@ HEARTWOOD_REPO_ROOT ?= $(CURDIR)/fixtures/git
 run: frontend/node_modules dist/.vite/manifest.json
 	@trap 'kill 0' EXIT INT TERM; \
 	(cd frontend && bun run dev) & \
-	PORT=$(PORT) HEARTWOOD_REPO_ROOT=$(HEARTWOOD_REPO_ROOT) $(CARGO) run
+	PORT=$(PORT) REPOS_REPO_ROOT=$(REPOS_REPO_ROOT) $(CARGO) run
 
 # Production build (Vite assets + release binary)
 build: frontend/node_modules
@@ -24,7 +24,7 @@ build: frontend/node_modules
 
 # Run the release binary (after `make build`)
 start:
-	PORT=$(PORT) ./target/release/heartwood
+	PORT=$(PORT) ./target/release/repos
 
 # Wipe regenerable output. Leaves fixtures/ alone so `make run` after `make
 # clean` doesn't blow away your seeded repos.

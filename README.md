@@ -1,4 +1,4 @@
-# Heartwood
+# Repos
 
 A minimal web frontend for the bare git repos on a single-operator server.
 Built to replace GitHub as the place my code is publicly visible.
@@ -44,7 +44,7 @@ For local development:
 
 - rust (cargo) for the backend
 - bun for the frontend bundler (Vite)
-- `git` on `PATH` (heartwood shells out to it for `http-backend` and `show`)
+- `git` on `PATH` (repos shells out to it for `http-backend` and `show`)
 
 
 ## Running locally
@@ -55,7 +55,7 @@ For local development:
 
 `make run` does not seed automatically; a fresh checkout shows an empty repo
 list until you run `make seed` once. The seed step is opt-in so you can also
-point `HEARTWOOD_REPO_ROOT` at a real directory and skip it entirely.
+point `REPOS_REPO_ROOT` at a real directory and skip it entirely.
 
 `make seed` runs the `seed` bin (see `src/bin/seed.rs`), which synthesizes
 fake-but-realistic bare git repos under `fixtures/git/`. It picks a mix of
@@ -80,14 +80,14 @@ All config comes from environment variables (loaded from `.env` via `dotenvy`):
 | Variable | Required | Purpose |
 |---|---|---|
 | `PORT` | no (default `8000`) | HTTP listen port |
-| `HEARTWOOD_ROOT` | no (default `.`) | Project root (where `templates/` and `dist/` live) |
-| `HEARTWOOD_REPO_ROOT` | no (default `/srv/git`) | Directory of `<name>.git/` bare repos |
-| `HEARTWOOD_CLONE_BASE` | no | Public origin used in clone URLs and atom self-links |
-| `HEARTWOOD_TITLE` | no (default `heartwood`) | Topbar title |
-| `HEARTWOOD_TAGLINE` | no (default `every commit a ring`) | Topbar tagline |
+| `REPOS_ROOT` | no (default `.`) | Project root (where `templates/` and `dist/` live) |
+| `REPOS_REPO_ROOT` | no (default `/srv/git`) | Directory of `<name>.git/` bare repos |
+| `REPOS_CLONE_BASE` | no (default `https://repos.bythewood.me`) | Public origin used in clone URLs and atom self-links |
+| `REPOS_TITLE` | no (default `repos`) | Topbar title |
+| `REPOS_TAGLINE` | no (default empty) | Optional topbar tagline; hidden when empty |
 | `BASE_URL` | no | `<base href>` if served on a subpath |
 
-In dev, `make run` sets `HEARTWOOD_REPO_ROOT` to `./fixtures/git` so you don't
+In dev, `make run` sets `REPOS_REPO_ROOT` to `./fixtures/git` so you don't
 need a real `/srv/git/`.
 
 
@@ -96,7 +96,7 @@ need a real `/srv/git/`.
 | Target | What it does |
 |---|---|
 | `make run` (default) | Vite watch + `cargo run` on port 8000 |
-| `make build` | Vite assets + release binary (`target/release/heartwood`) |
+| `make build` | Vite assets + release binary (`target/release/repos`) |
 | `make start` | Run the release binary (after `make build`) |
 | `make seed` | Synthesize fake bare repos under `fixtures/git/` (idempotent, opt-in) |
 | `make seed-reset` | Wipe and re-synthesize `fixtures/git/` |
@@ -111,7 +111,7 @@ There are no tests or linters configured.
 
 ## Key Routes
 
-- `/`: repo list (auto-discovered from `HEARTWOOD_REPO_ROOT`, sorted by most-recent HEAD)
+- `/`: repo list (auto-discovered from `REPOS_REPO_ROOT`, sorted by most-recent HEAD)
 - `/<name>`: repo landing (README, recent commits, clone URL)
 - `/<name>/log`: commit log (default branch unless `?rev=` given, `?limit=` up to 500)
 - `/<name>/commit/<sha>`: single commit + unified diff
@@ -132,19 +132,19 @@ Server:
     apk update && apk upgrade && apk add docker docker-compose caddy git iptables ip6tables ufw
     ufw allow 22/tcp && ufw allow 80/tcp && ufw allow 443/tcp && ufw --force enable
     rc-update add docker boot && service docker start
-    mkdir -p /srv/git/heartwood.git && cd /srv/git/heartwood.git && git init --bare
+    mkdir -p /srv/git/repos.git && cd /srv/git/repos.git && git init --bare
 
 Local:
 
-    git remote add server root@heartwood.example.com:/srv/git/heartwood.git
+    git remote add server root@repos.example.com:/srv/git/repos.git
     git push --set-upstream server master
 
 Server:
 
-    mkdir -p /srv/docker && cd /srv/docker && git clone /srv/git/heartwood.git heartwood && cd /srv/docker/heartwood
+    mkdir -p /srv/docker && cd /srv/docker && git clone /srv/git/repos.git repos && cd /srv/docker/repos
     cp samplefiles/Caddyfile.sample /etc/caddy/Caddyfile
-    cp samplefiles/env.sample .env  # edit HEARTWOOD_CLONE_BASE and HEARTWOOD_TITLE/TAGLINE
-    cp samplefiles/post-receive.sample /srv/git/heartwood.git/hooks/post-receive && chmod +x /srv/git/heartwood.git/hooks/post-receive
+    cp samplefiles/env.sample .env  # edit REPOS_CLONE_BASE and REPOS_TITLE if you want
+    cp samplefiles/post-receive.sample /srv/git/repos.git/hooks/post-receive && chmod +x /srv/git/repos.git/hooks/post-receive
     docker-compose up --build --detach
     rc-update add caddy boot && service caddy start
 

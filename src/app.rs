@@ -27,19 +27,17 @@ pub struct Config {
 
 impl AppState {
     pub fn from_env() -> Self {
-        let root: PathBuf = std::env::var("HEARTWOOD_ROOT")
+        let root: PathBuf = std::env::var("REPOS_ROOT")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("."));
-        let repo_root: PathBuf = std::env::var("HEARTWOOD_REPO_ROOT")
+        let repo_root: PathBuf = std::env::var("REPOS_REPO_ROOT")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("/srv/git"));
         let base_url = std::env::var("BASE_URL").unwrap_or_default();
-        let clone_base = std::env::var("HEARTWOOD_CLONE_BASE")
-            .unwrap_or_else(|_| "https://heartwood.bythewood.me".to_string());
-        let site_title =
-            std::env::var("HEARTWOOD_TITLE").unwrap_or_else(|_| "heartwood".to_string());
-        let site_tagline = std::env::var("HEARTWOOD_TAGLINE")
-            .unwrap_or_else(|_| "every commit a ring".to_string());
+        let clone_base = std::env::var("REPOS_CLONE_BASE")
+            .unwrap_or_else(|_| "https://repos.bythewood.me".to_string());
+        let site_title = std::env::var("REPOS_TITLE").unwrap_or_else(|_| "repos".to_string());
+        let site_tagline = std::env::var("REPOS_TAGLINE").unwrap_or_default();
 
         let templates_dir = root.join("templates");
         let manifest_path = root.join("dist/.vite/manifest.json");

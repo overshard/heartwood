@@ -1240,33 +1240,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
 
 [[package]]
-name = "heartwood"
-version = "0.1.0"
-dependencies = [
- "ammonia",
- "anyhow",
- "async-stream",
- "axum",
- "bytes",
- "chrono",
- "dotenvy",
- "futures-util",
- "gix",
- "mime_guess",
- "minijinja",
- "pulldown-cmark",
- "serde",
- "serde_json",
- "syntect",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "urlencoding",
-]
-
-[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2053,6 +2026,33 @@ name = "regex-syntax"
 version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc897dd8d9e8bd1ed8cdad82b5966c3e0ecae09fb1907d58efaa013543185d0a"
+
+[[package]]
+name = "repos"
+version = "0.1.0"
+dependencies = [
+ "ammonia",
+ "anyhow",
+ "async-stream",
+ "axum",
+ "bytes",
+ "chrono",
+ "dotenvy",
+ "futures-util",
+ "gix",
+ "mime_guess",
+ "minijinja",
+ "pulldown-cmark",
+ "serde",
+ "serde_json",
+ "syntect",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "urlencoding",
+]
 
 [[package]]
 name = "rustix"

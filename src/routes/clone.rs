@@ -76,7 +76,7 @@ async fn upload_pack(
 async fn receive_pack_forbidden() -> Response {
     (
         StatusCode::METHOD_NOT_ALLOWED,
-        "heartwood is read-only; push to the server's git remote directly",
+        "repos is read-only; push to the server's git remote directly",
     )
         .into_response()
 }

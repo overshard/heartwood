@@ -61,7 +61,7 @@ QUERY_STRING, REQUEST_METHOD, CONTENT_TYPE, GIT_PROJECT_ROOT,
 GIT_HTTP_EXPORT_ALL, plus a few HTTP_* passthrough headers). Request body
 is piped into stdin; CGI headers are parsed off stdout, the rest is
 streamed back as the response body. `/git-receive-pack` is wired but
-returns 405 (heartwood is read-only).
+returns 405 (repos is read-only).
 
 **Templates (`templates/`):** Jinja2-compatible. `base.html` is the shell;
 `index.html` is the repo list; `repo.html` is README + recent commits +
@@ -96,21 +96,21 @@ URL gets the themed shell instead of a plain-text 404.
 All via env vars (defaults shown):
 
 - `PORT=8000` — HTTP listen port.
-- `HEARTWOOD_ROOT=.` — project root (where `templates/` and `dist/` live).
-- `HEARTWOOD_REPO_ROOT=/srv/git` — directory containing `<name>.git/` bare repos.
-- `HEARTWOOD_CLONE_BASE=https://heartwood.bythewood.me` — public origin used
-  in clone URLs and atom self-links.
-- `HEARTWOOD_TITLE=heartwood` and `HEARTWOOD_TAGLINE=every commit a ring`
-  for the topbar.
+- `REPOS_ROOT=.` — project root (where `templates/` and `dist/` live).
+- `REPOS_REPO_ROOT=/srv/git` — directory containing `<name>.git/` bare repos.
+- `REPOS_CLONE_BASE=https://repos.bythewood.me` — public origin used in clone
+  URLs and atom self-links.
+- `REPOS_TITLE=repos` — topbar title.
+- `REPOS_TAGLINE=` — optional tagline; hidden in the topbar and footer when empty.
 - `BASE_URL=` — optional `<base href>` if served on a subpath.
 
-In dev, `make run` sets `HEARTWOOD_REPO_ROOT=./fixtures/git` so you don't
+In dev, `make run` sets `REPOS_REPO_ROOT=./fixtures/git` so you don't
 need a real `/srv/git/`.
 
 ## Layout
 
 ```
-heartwood/
+repos/
 ├── Cargo.toml, Cargo.lock
 ├── Makefile, README.md, LICENSE.md, CLAUDE.md
 ├── src/
@@ -146,7 +146,7 @@ heartwood/
 
 ## Key Routes
 
-- `/` — repo list (auto-discovered from `HEARTWOOD_REPO_ROOT`)
+- `/` — repo list (auto-discovered from `REPOS_REPO_ROOT`)
 - `/:name` — repo landing: README + recent commits + clone URL
 - `/:name/log` — commit log (default branch unless `?rev=` given, `?limit=` up to 500)
 - `/:name/commit/:sha` — single commit + unified diff

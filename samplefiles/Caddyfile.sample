@@ -1,5 +1,5 @@
-heartwood.bythewood.me {
-  reverse_proxy heartwood:8000
+repos.bythewood.me {
+  reverse_proxy repos:8000
 
   import common
 }

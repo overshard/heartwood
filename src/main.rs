@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await?;
-    tracing::info!("heartwood listening on http://{addr}");
+    tracing::info!("repos listening on http://{addr}");
     // ConnectInfo so clone routes can pass REMOTE_ADDR to git http-backend.
     axum::serve(
         listener,

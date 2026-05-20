@@ -13,7 +13,7 @@ fn theme() -> &'static Theme {
     static CELL: OnceLock<Theme> = OnceLock::new();
     CELL.get_or_init(|| {
         let mut ts = ThemeSet::load_defaults();
-        // base16-eighties.dark reads well on the heartwood palette and ships
+        // base16-eighties.dark reads well on the dark palette and ships
         // with syntect's default themes, so no theme files to vendor.
         ts.themes
             .remove("base16-eighties.dark")

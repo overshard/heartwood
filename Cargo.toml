@@ -1,10 +1,10 @@
 [package]
-name = "heartwood"
+name = "repos"
 version = "0.1.0"
 edition = "2021"
 # With a second binary in src/bin/ (seed), `cargo run` becomes ambiguous.
 # Pin the default to the server so `cargo run` from the Makefile still works.
-default-run = "heartwood"
+default-run = "repos"
 
 [dependencies]
 axum = { version = "0.8", features = ["macros"] }
@@ -30,7 +30,7 @@ async-stream = "0.3"
 mime_guess = "2"
 
 [profile.release]
-# Match darkfurrow: small + fast. Heartwood has no chunky dep tree
+# Match darkfurrow: small + fast. Repos has no chunky dep tree
 # (no typst, no chromium) so LTO is tractable.
 lto = true
 codegen-units = 1

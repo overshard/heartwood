@@ -1,4 +1,4 @@
-// heartwood — palette evokes the dense red-brown center of a tree.
+// repos — palette evokes the dense red-brown center of a tree (heartwood).
 
 :root {
   --bg:        #1a1410;
@@ -7,7 +7,7 @@
   --border:    #3d2f24;
   --text:      #e8dccc;
   --text-mute: #9c8a72;
-  --accent:    #b8543a; // heartwood red
+  --accent:    #b8543a; // heartwood-red core
   --accent-2:  #c4a574; // sap gold
   --green:     #6b9e78;
   --code-bg:   #15100c;
@@ -68,7 +68,7 @@ code, pre, .sha, .clone-box input {
   padding: 1.15rem 0;
 
   // The outer accent stripe is a horizontal cross-section of the brand
-  // mark: heartwood-red core, sap-gold middle ring, green outer ring.
+  // mark: red core, sap-gold middle ring, green outer ring.
   // Reads as a tree-ring slice across the top of every page.
   &::before {
     content: "";
