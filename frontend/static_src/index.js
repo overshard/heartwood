@@ -1,5 +1,4 @@
-import "@fontsource/jetbrains-mono/400.css";
-import "@fontsource/jetbrains-mono/600.css";
+import "@fontsource/monaspace-argon";
 import "./styles/base.scss";
 
 document.querySelectorAll(".clone-box input").forEach((el) => {

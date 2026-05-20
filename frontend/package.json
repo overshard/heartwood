@@ -6,7 +6,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@fontsource/jetbrains-mono": "^5.2.5"
+    "@fontsource/monaspace-argon": "^5.2.5"
   },
   "devDependencies": {
     "sass": "^1.97.3",
