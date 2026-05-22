@@ -190,6 +190,8 @@ code, pre, .sha, .clone-box input {
   font-size: 0.9rem;
   color: var(--text-mute);
   padding: 0.85rem 0;
+  // A deep path with a long component must wrap, not scroll the page.
+  overflow-wrap: anywhere;
 
   strong { color: var(--text); font-weight: 600; }
 
@@ -415,6 +417,13 @@ main { padding: 3rem 0 4rem; }
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 1.5rem 2rem;
+  // Long URLs and other unbreakable tokens wrap instead of widening the
+  // page; the README is user content so we can't assume it stays narrow.
+  overflow-wrap: break-word;
+
+  // Tighter gutters on phones — 2rem of padding plus the container's own
+  // 1.25rem leaves too little room for prose on a 375px screen.
+  @media (max-width: 540px) { padding: 1.15rem 1.15rem; }
 
   h1, h2, h3, h4 {
     font-family: var(--mono);
@@ -439,7 +448,16 @@ main { padding: 3rem 0 4rem; }
     color: var(--text-mute);
     margin: 1rem 0;
   }
+  // A markdown table can easily be wider than a phone screen. `display:
+  // block` turns the <table> itself into a horizontal scroll container
+  // (the rows still lay out as a table inside an anonymous table box), so
+  // a wide table scrolls on its own instead of forcing the whole page
+  // wide. `width: max-content` keeps a narrow table from stretching.
   table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
     margin: 1rem 0;
     th, td {
@@ -479,7 +497,7 @@ main { padding: 3rem 0 4rem; }
   tr { border-bottom: 1px solid var(--border); }
   td { padding: 0.5rem 0.75rem; }
 
-  &__name { width: 100%; }
+  &__name { width: 100%; overflow-wrap: anywhere; }
   &__name--tree a::before { content: ""; color: var(--accent-2); }
   &__name--blob a::before { content: ""; color: var(--text-mute); }
   &__size { color: var(--text-mute); text-align: right; white-space: nowrap; }
@@ -559,10 +577,15 @@ main { padding: 3rem 0 4rem; }
     padding: 0.5rem 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    // Let a long file path wrap below the status badge instead of being
+    // clipped by this article's `overflow: hidden`.
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
     font-family: var(--mono);
     font-size: 0.88rem;
   }
+
+  .path { overflow-wrap: anywhere; min-width: 0; }
 }
 
 .status {
