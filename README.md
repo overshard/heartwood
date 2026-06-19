@@ -1,12 +1,14 @@
 # Repos
 
-A minimal web frontend for the bare git repos on a single-operator server.
-Built to replace GitHub as the place my code is publicly visible.
+A minimal, self-hosted web frontend for browsing the bare git repos on a
+single-operator server. I built it to replace GitHub as the place my code is
+publicly visible: a small, public, read-only window into a directory of bare
+repos, with nothing else attached.
 
-Single-binary axum service. No database, no auth, no pull requests, no issues.
-Repo metadata is read live from the bare repos via `gix` (gitoxide). The
-commit-diff view shells out to `git show --patch`, and `git clone` over HTTPS
-works through `git http-backend` as a CGI subprocess. Everything else is
+It is a single-binary axum service. No database, no auth, no pull requests, no
+issues. Repo metadata is read live from the bare repos via `gix` (gitoxide).
+The commit-diff view shells out to `git show --patch`, and `git clone` over
+HTTPS works through `git http-backend` as a CGI subprocess. Everything else is
 in-process.
 
 
