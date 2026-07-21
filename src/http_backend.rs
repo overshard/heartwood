@@ -68,6 +68,10 @@ pub async fn serve(req: CgiRequest<'_>, body: Body) -> Result<Response> {
     }
 
     cmd.stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    // If the client disconnects mid-clone the response stream (and the
+    // child handle in it) is dropped; without this the orphaned
+    // http-backend/upload-pack would keep packing to a dead pipe.
+    cmd.kill_on_drop(true);
 
     let mut child = cmd.spawn().context("spawn git http-backend")?;
     let mut stdin = child.stdin.take().ok_or_else(|| anyhow!("no stdin"))?;

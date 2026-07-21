@@ -118,6 +118,7 @@ pub fn build_env(templates_dir: &Path, manifest_path: &Path) -> Environment<'sta
     env.add_filter("rfc3339", rfc3339_filter);
     env.add_filter("filesize", filesize_filter);
     env.add_filter("urlencode", urlencode_filter);
+    env.add_filter("urlencode_path", urlencode_path_filter);
 
     env
 }
@@ -146,6 +147,20 @@ fn urlencode_filter(value: Value) -> Result<String, Error> {
         .map(|s| s.to_string())
         .unwrap_or_else(|| value.to_string());
     Ok(urlencoding::encode(&s).into_owned())
+}
+
+/// Percent-encode each segment of a slash-separated path while keeping the
+/// separators, so tree/blob paths with `#`, `?`, or `%` in a filename still
+/// produce working hrefs.
+fn urlencode_path_filter(value: Value) -> Result<String, Error> {
+    let s = value
+        .as_str()
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| value.to_string());
+    Ok(s.split('/')
+        .map(|seg| urlencoding::encode(seg).into_owned())
+        .collect::<Vec<_>>()
+        .join("/"))
 }
 
 fn filesize_filter(value: Value) -> Result<String, Error> {

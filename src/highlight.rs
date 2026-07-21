@@ -27,17 +27,19 @@ pub fn highlight(source: &str, filename: &str) -> String {
     let ss = syntax_set();
     let theme = theme();
 
+    // Never find_syntax_for_file here: it opens the named file on the
+    // server's filesystem, but `filename` is a blob basename from the URL,
+    // not a real local file. Match on the extension (which for files like
+    // "Makefile" can be the whole name), then sniff the first line
+    // (shebangs, XML declarations) from the blob itself.
+    let ext = std::path::Path::new(filename)
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("");
     let syntax = ss
-        .find_syntax_for_file(filename)
-        .ok()
-        .flatten()
-        .or_else(|| {
-            let ext = std::path::Path::new(filename)
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("");
-            ss.find_syntax_by_extension(ext)
-        })
+        .find_syntax_by_extension(ext)
+        .or_else(|| ss.find_syntax_by_extension(filename))
+        .or_else(|| source.lines().next().and_then(|l| ss.find_syntax_by_first_line(l)))
         .unwrap_or_else(|| ss.find_syntax_plain_text());
 
     let mut highlighter = syntect::easy::HighlightLines::new(syntax, theme);

@@ -29,7 +29,11 @@ async fn feed(Path(name): Path<String>, State(state): State<AppState>) -> Respon
     .await;
     let (summary, commits) = match result {
         Ok(Ok(v)) => v,
-        Ok(Err(e)) => return (axum::http::StatusCode::NOT_FOUND, format!("{e}")).into_response(),
+        Ok(Err(e)) => {
+            // Generic body: the error string can carry filesystem paths.
+            tracing::debug!("atom feed for unknown repo: {e:#}");
+            return (axum::http::StatusCode::NOT_FOUND, "not found").into_response();
+        }
         Err(e) => {
             tracing::error!("atom join: {e}");
             return (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "error").into_response();

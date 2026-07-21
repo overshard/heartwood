@@ -301,10 +301,9 @@ pub fn list_tree(
             "blob"
         };
         let size = if kind == "blob" {
-            repo.find_object(entry_ref.oid())
-                .ok()
-                .and_then(|o| o.try_into_blob().ok())
-                .map(|b| b.data.len() as u64)
+            // Header lookup only: find_object would load every blob's full
+            // contents just to report its size in the listing.
+            repo.find_header(entry_ref.oid()).ok().map(|h| h.size())
         } else {
             None
         };
@@ -397,6 +396,12 @@ pub fn read_readme(repo: &gix::Repository, rev: gix::ObjectId) -> Option<(String
         }
     });
     let (name, oid) = candidates.into_iter().next()?;
+    // A README bigger than this is not a README; skip it rather than feed
+    // megabytes through markdown + sanitize on every repo page view.
+    const README_CAP: u64 = 1024 * 1024;
+    if repo.find_header(oid).ok().map(|h| h.size()).unwrap_or(u64::MAX) > README_CAP {
+        return None;
+    }
     let blob = repo.find_object(oid).ok()?.try_into_blob().ok()?;
     Some((name, blob.data.clone()))
 }
@@ -431,7 +436,21 @@ pub fn diff_commit(repo_path: &Path, oid: gix::ObjectId) -> Result<Vec<FileDiff>
             String::from_utf8_lossy(&output.stderr)
         ));
     }
-    Ok(parse_unified_diff(&String::from_utf8_lossy(&output.stdout)))
+    // Cap what we parse and render: a generated-file or vendored-tree commit
+    // can produce a diff of hundreds of MB, and every byte of it would be
+    // parsed, allocated, and templated. Cut at a line boundary.
+    const DIFF_OUTPUT_CAP: usize = 2 * 1024 * 1024;
+    let text = String::from_utf8_lossy(&output.stdout);
+    if text.len() > DIFF_OUTPUT_CAP {
+        tracing::warn!("diff for {oid} truncated at {DIFF_OUTPUT_CAP} bytes");
+        let mut end = DIFF_OUTPUT_CAP;
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        let cut = text[..end].rfind('\n').unwrap_or(end);
+        return Ok(parse_unified_diff(&text[..cut]));
+    }
+    Ok(parse_unified_diff(&text))
 }
 
 fn parse_unified_diff(text: &str) -> Vec<FileDiff> {

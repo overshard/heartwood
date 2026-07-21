@@ -8,12 +8,12 @@
     <span class="breadcrumbs__sep">/</span>
     <a href="/{{ repo.name }}">{{ repo.name }}</a>
     <span class="breadcrumbs__sep">/</span>
-    <a href="/{{ repo.name }}/tree/{{ rev }}">tree</a>
+    <a href="/{{ repo.name }}/tree/{{ rev|urlencode }}">tree</a>
     {% set cumulative = '' %}
     {% for part in breadcrumb %}
-      {% set cumulative = cumulative ~ '/' ~ part %}
+      {% set cumulative = cumulative ~ '/' ~ (part|urlencode) %}
       <span class="breadcrumbs__sep">/</span>
-      <a href="/{{ repo.name }}/tree/{{ rev }}{{ cumulative }}">{{ part }}</a>
+      <a href="/{{ repo.name }}/tree/{{ rev|urlencode }}{{ cumulative }}">{{ part }}</a>
     {% endfor %}
     <span class="breadcrumbs__ref">@ {{ rev }}</span>
   </div>
@@ -24,20 +24,20 @@
 <table class="tree">
   <tbody>
     {% if breadcrumb %}
-    {% set parent_path = breadcrumb[:-1]|join('/') %}
+    {% set parent_path = breadcrumb[:-1]|join('/')|urlencode_path %}
     <tr>
-      <td class="tree__name"><a href="/{{ repo.name }}/tree/{{ rev }}{% if parent_path %}/{{ parent_path }}{% endif %}">..</a></td>
+      <td class="tree__name"><a href="/{{ repo.name }}/tree/{{ rev|urlencode }}{% if parent_path %}/{{ parent_path }}{% endif %}">..</a></td>
       <td class="tree__size"></td>
     </tr>
     {% endif %}
     {% for e in entries %}
     <tr>
       <td class="tree__name tree__name--{{ e.kind }}">
-        {% set basepath = breadcrumb|join('/') %}
+        {% set basepath = breadcrumb|join('/')|urlencode_path %}
         {% if e.kind == 'tree' %}
-        <a href="/{{ repo.name }}/tree/{{ rev }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name }}">{{ e.name }}/</a>
+        <a href="/{{ repo.name }}/tree/{{ rev|urlencode }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name|urlencode }}">{{ e.name }}/</a>
         {% elif e.kind == 'blob' %}
-        <a href="/{{ repo.name }}/blob/{{ rev }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name }}">{{ e.name }}</a>
+        <a href="/{{ repo.name }}/blob/{{ rev|urlencode }}/{% if basepath %}{{ basepath }}/{% endif %}{{ e.name|urlencode }}">{{ e.name }}</a>
         {% else %}
         <span>{{ e.name }}</span>
         {% endif %}

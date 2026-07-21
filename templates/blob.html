@@ -8,14 +8,14 @@
     <span class="breadcrumbs__sep">/</span>
     <a href="/{{ repo.name }}">{{ repo.name }}</a>
     <span class="breadcrumbs__sep">/</span>
-    <a href="/{{ repo.name }}/tree/{{ rev }}">tree</a>
+    <a href="/{{ repo.name }}/tree/{{ rev|urlencode }}">tree</a>
     {% set parts = path|split('/') %}
     {% set cumulative = '' %}
     {% for part in parts %}
       <span class="breadcrumbs__sep">/</span>
       {% if not loop.last %}
-        {% set cumulative = cumulative ~ '/' ~ part %}
-        <a href="/{{ repo.name }}/tree/{{ rev }}{{ cumulative }}">{{ part }}</a>
+        {% set cumulative = cumulative ~ '/' ~ (part|urlencode) %}
+        <a href="/{{ repo.name }}/tree/{{ rev|urlencode }}{{ cumulative }}">{{ part }}</a>
       {% else %}
         <strong>{{ part }}</strong>
       {% endif %}
@@ -28,11 +28,13 @@
 {% block main %}
 <div class="blob-head">
   <span class="blob-head__size">{{ size|filesize }}</span>
-  <a class="blob-head__raw" href="/{{ repo.name }}/raw/{{ rev }}/{{ path }}">raw</a>
+  <a class="blob-head__raw" href="/{{ repo.name }}/raw/{{ rev|urlencode }}/{{ path|urlencode_path }}">raw</a>
 </div>
 
 {% if is_binary %}
-<p class="empty">binary file. <a href="/{{ repo.name }}/raw/{{ rev }}/{{ path }}">download raw</a></p>
+<p class="empty">binary file. <a href="/{{ repo.name }}/raw/{{ rev|urlencode }}/{{ path|urlencode_path }}">download raw</a></p>
+{% elif too_large %}
+<p class="empty">too large to display. <a href="/{{ repo.name }}/raw/{{ rev|urlencode }}/{{ path|urlencode_path }}">view raw</a></p>
 {% else %}
 <div class="blob">{{ highlighted }}</div>
 {% endif %}

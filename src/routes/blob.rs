@@ -38,7 +38,11 @@ async fn blob_page(
     match result {
         Ok(Ok((summary, blob))) => {
             let basename = path.rsplit('/').next().unwrap_or(&path).to_string();
-            let highlighted = if blob.is_binary {
+            // Syntect on multi-MB sources is seconds of CPU per request;
+            // past this cap the page offers the raw link instead.
+            const HIGHLIGHT_CAP: usize = 1024 * 1024;
+            let too_large = !blob.is_binary && blob.data.len() > HIGHLIGHT_CAP;
+            let highlighted = if blob.is_binary || too_large {
                 None
             } else {
                 let text = String::from_utf8_lossy(&blob.data).into_owned();
@@ -55,6 +59,7 @@ async fn blob_page(
                     basename => basename,
                     size => blob.size,
                     is_binary => blob.is_binary,
+                    too_large => too_large,
                     highlighted => highlighted.map(minijinja::Value::from_safe_string),
                 },
             )
@@ -86,11 +91,23 @@ async fn blob_raw(
     .await;
     match result {
         Ok(Ok((data, mime))) => {
+            // Never serve repo content as an active type: an HTML or SVG
+            // blob rendered inline would run its scripts on this origin
+            // (stored XSS from any pushed file).
+            let mime = match mime.as_str() {
+                "text/html" | "application/xhtml+xml" | "image/svg+xml" | "text/xml"
+                | "application/xml" => "text/plain".to_string(),
+                _ => mime,
+            };
             let mut resp = data.into_response();
             let value = mime
                 .parse()
                 .unwrap_or_else(|_| header::HeaderValue::from_static("application/octet-stream"));
             resp.headers_mut().insert(header::CONTENT_TYPE, value);
+            resp.headers_mut().insert(
+                header::X_CONTENT_TYPE_OPTIONS,
+                header::HeaderValue::from_static("nosniff"),
+            );
             resp
         }
         Ok(Err(e)) => not_found(&state, &name, e),
