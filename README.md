@@ -1,10 +1,6 @@
+> **Archived.** This project is no longer in use and no longer maintained.
+
 # Repos
-
-> **Archived and no longer maintained.**
-> This is the Rust implementation, kept as a read-only snapshot. It was renamed from
-> `repos` to `repos-rust` when development moved on, and it receives no further
-> updates, fixes, or security patches. Use it as a reference, not as running software.
-
 
 A minimal, self-hosted web frontend for browsing the bare git repos on a
 single-operator server. I built it to replace GitHub as the place my code is
